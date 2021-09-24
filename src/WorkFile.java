@@ -88,19 +88,19 @@ public class WorkFile {
         for (int i = 0; i < listZipFiles.size(); i++) {
             File fileDelete = new File(listZipFiles.get(i));
             if (fileDelete.delete()) {
-                System.out.println("File has been deleted from folder");
+                System.out.println("File " + fileDelete.getName() + " deleted from folder");
             }
         }
         System.out.println();
 
         //задача 3.1 распаковка из zip
 
-        openZip("/Users/SIREN-A/Games/savegames/zip.zip", "/Users/SIREN-A/Games/savegames/new");
+        openZip("/Users/SIREN-A/Games/savegames/zip.zip", "/Users/SIREN-A/Games/savegames/");
 
         //задача 3.2  считывание и десериализация одного из разархивированных файлов и вывод в консоль
 
-        openProgress("/Users/SIREN-A/Games/savegames/newsave1.dat");
-        System.out.println(openProgress("/Users/SIREN-A/Games/savegames/newsave1.dat"));
+        openProgress("/Users/SIREN-A/Games/savegames/save1.dat");
+        System.out.println(openProgress("/Users/SIREN-A/Games/savegames/save1.dat"));
 
 
     }
@@ -141,6 +141,7 @@ public class WorkFile {
     }
 
     private static void openZip(String wayToArchive, String unpackFolder) {
+        File folder = new File(unpackFolder);
         try (ZipInputStream zin = new ZipInputStream(new FileInputStream(wayToArchive))) {
             ZipEntry entry;
             String name;
@@ -149,13 +150,17 @@ public class WorkFile {
 
                 name = entry.getName(); // получим название файла
                 // распаковка
-                FileOutputStream fout = new FileOutputStream(unpackFolder + name);
-                for (int c = zin.read(); c != -1; c = zin.read()) {
-                    fout.write(c);
+                if (folder.exists()) {
+                    FileOutputStream fout = new FileOutputStream(unpackFolder + name);
+                    for (int c = zin.read(); c != -1; c = zin.read()) {
+                        fout.write(c);
+                    }
+                    fout.flush();
+                    zin.closeEntry();
+                    fout.close();
+                } else {
+                    boolean created = folder.mkdir();
                 }
-                fout.flush();
-                zin.closeEntry();
-                fout.close();
             }
         } catch (Exception ex) {
 
